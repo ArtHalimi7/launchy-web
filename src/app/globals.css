@@ -1,26 +1,106 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Launchy's tokens: the app's palette (Backbone's, the sibling site), Inter Tight for everything,
+ * JetBrains Mono for what a camera would print, Instrument Serif for the odd accent word.
+ */
+@theme {
+  --color-ink: #0b0c0e;
+  --color-coal: #121316;
+  --color-smoke: #1b1d21;
+  --color-ash: #8a8c92;
+  --color-fog: #c9c6be;
+  --color-cream: #f2efe8;
+  --color-paper: #e7e2d7;
+  --color-ember: #ff5a1f;
+  --color-volt: #3d8bff;
+
+  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-serif: var(--font-instrument-serif), ui-serif, serif;
+
+  --tracking-crush: -0.065em;
+  --tracking-tight2: -0.045em;
+
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-quart: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    background: var(--color-ink);
+    color: var(--color-cream);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    font-family: var(--font-sans);
+    overflow-x: clip;
+  }
+  ::selection {
+    background: var(--color-ember);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ember);
+    outline-offset: 3px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* What a camera would print: tiny mono capitals. */
+@utility label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.3;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* The opening plays once per visit; returning visitors and reduced motion go straight in. */
+html[data-opened] .opening {
+  display: none;
+}
+
+/* The wall drifts on its own, on the compositor: a row moves one copy's width, then loops. */
+@keyframes drift-left {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+@keyframes drift-right {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+.drift {
+  animation: drift-left var(--drift, 60s) linear infinite;
+}
+.drift-reverse {
+  animation: drift-right var(--drift, 60s) linear infinite;
+}
+
+@keyframes blink {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  56%,
+  100% {
+    opacity: 0.15;
+  }
+}
+.blink {
+  animation: blink 1.4s steps(1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift,
+  .drift-reverse,
+  .blink {
+    animation: none;
+  }
 }
