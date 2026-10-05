@@ -1,79 +1,56 @@
 /*
- * Every word on the site, in one place. Short sentences, everyday words, a full stop after each
- * headline, the way the app and Backbone write. Nothing here claims a number we can't show.
+ * Every word on the page, in one place. Written for someone who just tapped a link under a TikTok:
+ * short, plain, and about them. Nothing here promises a number.
  */
 
-export const APPLY_HREF = "#apply";
+/**
+ * Where "Get the app" goes: the app's public TestFlight link. Set NEXT_PUBLIC_TESTFLIGHT_URL when
+ * deploying (App Store Connect → TestFlight → External testing → Public link).
+ */
+export const TESTFLIGHT_URL = process.env.NEXT_PUBLIC_TESTFLIGHT_URL ?? "https://testflight.apple.com/join/LAUNCHY";
 
 export const HERO = {
-  kicker: "React · DIY · Cooking · Challenges",
-  lines: ["Get paid", "to create"],
-  sub: "You film. We edit, post and pay you.",
-  apply: "Apply to create",
-  how: "How it works",
+  badge: "For creators",
+  title: ["Get paid", "to film."],
+  sub: "Pick an idea, film it on your phone. We edit it, post it and pay you.",
 };
 
-export const MANIFESTO = {
-  lines: [
-    ["Your", "phone", "is", "the", "studio."],
-    ["We’re", "the", "rest."],
-  ],
-  after: "We find the ideas. You film them. We edit, post and pay you.",
+export const CTA = {
+  ios: "Get the app",
+  note: "Free · iPhone · opens in TestFlight",
+  firstTime: "First time with TestFlight?",
+  android: "iPhone only for now",
+  androidNote: "Launchy on Android is coming soon.",
+  scanTitle: "On your computer?",
+  scanBody: "Scan with your iPhone’s camera to get the app.",
 };
+
+export const FORMATS_TITLE = "Pick what you like making.";
 
 export const FORMATS = [
-  {
-    id: "react",
-    kicker: "Video · Reaction",
-    title: "React to a clip.",
-    body: "Pick one from today’s library, film yourself watching. We put the two together.",
-  },
-  {
-    id: "diy",
-    kicker: "DIY · Hacks · Crafts",
-    title: "Make something.",
-    body: "A project, step by step: what you need, what to do, how to film it.",
-  },
-  {
-    id: "cooking",
-    kicker: "Food · Recipes",
-    title: "Cook something.",
-    body: "Tonight’s dinner, shot by shot, with a timer that rings when it’s time.",
-  },
-  {
-    id: "challenge",
-    kicker: "Series · Challenges",
-    title: "Take a challenge.",
-    body: "A series on one theme. Finish every video and it becomes a YouTube compilation.",
-  },
+  { id: "react", title: "React to a clip", body: "Film yourself watching today’s pick." },
+  { id: "diy", title: "Make something", body: "A DIY project, step by step." },
+  { id: "cooking", title: "Cook something", body: "A recipe, shot by shot." },
+  { id: "challenge", title: "Take a challenge", body: "A series on one theme." },
 ] as const;
 
-export const FILM = {
-  title: "Film each step.",
-  accent: "We cut the video.",
-  body: "Every project comes as steps, each with its shot and its length. Film them in order, and the edit is ours.",
-  steps: ["Cut the bottle", "Prep the roll", "Stuff it in", "Soak it", "Plant it"],
-};
+export const STEPS_TITLE = "How it works.";
 
-export const POST = {
-  title: "We post it.",
-  accent: "You watch it grow.",
-  body: "Our team reviews every take, finishes the edit, and puts it out on our pages. You follow it from your phone, step by step.",
-  steps: ["Sent", "In review", "Approved", "Live"],
-};
+export const STEPS = [
+  { title: "Pick an idea", body: "Clips, projects, recipes and challenges, new every week." },
+  { title: "Film it", body: "The app tells you every shot: what to do and how long." },
+  { title: "Get paid", body: "We edit it and post it. You earn from the views it gets." },
+];
 
-export const EARN = {
-  big: ["Every", "view."],
-  title: "You earn from it.",
-  body: "See what each video makes, day by day, in the app.",
-};
+export const FAQ_TITLE = "Questions.";
 
-export const FINALE = {
-  title: "Your turn.",
-  body: "Launchy is invite-only while we grow. Get the app, apply in a minute, and we’ll set you up.",
-  stores: ["App Store", "Google Play"],
-  soon: "Coming soon",
-};
-
-/** The scenes, in order: the frame's bottom line reads them out as you scroll. */
-export const SCENES = ["Rolling", "The idea", "Pick", "Film", "Post", "Earn", "That’s a wrap"];
+export const FAQ = [
+  {
+    id: "testflight",
+    q: "What’s TestFlight?",
+    a: "Apple’s app for trying apps before they reach the App Store. Tap Get the app, install TestFlight if it asks, then open Launchy from it. Takes a minute.",
+  },
+  { id: "free", q: "Is it free?", a: "Yes. Launchy is free to download and free to use." },
+  { id: "followers", q: "Do I need followers?", a: "No. Your videos go out on our pages, so you don’t need an audience of your own." },
+  { id: "paid", q: "How do I get paid?", a: "You earn from the views your videos get, and you can follow it video by video in the app." },
+];

@@ -1,69 +1,46 @@
-"use client";
-
-import { m } from "motion/react";
-import { useId } from "react";
-
-import { WORDMARK } from "@/lib/brand-paths";
-import { EXPO } from "@/lib/motion";
+import { MARK, WORDMARK } from "@/lib/brand-paths";
 
 /**
- * The script "launchy." As in the app's loader, it can write itself: the pen runs along the
- * measured centreline of the letters (`stroke`), clipped to the artwork's exact outline, so what
- * appears is the real logo, stroke by stroke. Then the full stop lands.
+ * The script "launchy." It writes itself once as the page opens: the pen runs along the measured
+ * centreline of the letters, clipped to the artwork's exact outline, so what appears is the real
+ * logo, stroke by stroke. Pure CSS (globals.css, `.write`), so it plays before any script loads,
+ * and reduced motion shows it finished.
  */
-export function Wordmark({
-  write = false,
-  show = true,
-  delay = 0,
-  duration = 1.25,
-  ink = "#ff5a1f",
-  dot = "#f2efe8",
-  className,
-  title = "Launchy",
-}: {
-  /** Draw it in (true), or show it finished. */
-  write?: boolean;
-  /** With `write`: hold it unwritten until this turns true (it comes into view, say). */
-  show?: boolean;
-  delay?: number;
-  duration?: number;
-  ink?: string;
-  dot?: string;
-  className?: string;
-  title?: string;
-}) {
-  const clip = useId().replace(/:/g, "");
-  const { w, h, outline, stroke, strokeWidth, dot: stop } = WORDMARK;
+export function Wordmark({ className, write = true, id = "wordmark" }: { className?: string; write?: boolean; /** Unique per use on the page: it names the clip path. */ id?: string }) {
+  const { w, h, outline, stroke, strokeWidth, dot } = WORDMARK;
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className={className} role="img" aria-label={title}>
+    <svg viewBox={`0 0 ${w} ${h}`} className={className} role="img" aria-label="Launchy">
       <defs>
-        <clipPath id={clip}>
+        <clipPath id={`${id}-clip`}>
           <path d={outline} clipRule="evenodd" />
         </clipPath>
       </defs>
-      <g clipPath={`url(#${clip})`}>
-        <m.path
+      <g clipPath={`url(#${id}-clip)`}>
+        <path
           d={stroke}
+          pathLength={1}
+          className={write ? "write" : undefined}
           fill="none"
-          stroke={ink}
+          stroke="#FF5A1F"
           strokeWidth={strokeWidth * 1.35}
           strokeLinecap="round"
           strokeLinejoin="round"
-          initial={write ? { pathLength: 0 } : false}
-          animate={{ pathLength: show ? 1 : 0 }}
-          transition={{ duration, delay, ease: [0.45, 0.05, 0.25, 1] }}
         />
       </g>
-      <m.circle
-        cx={stop.cx}
-        cy={stop.cy}
-        r={stop.r}
-        fill={dot}
-        initial={write ? { scale: 0, opacity: 0 } : false}
-        animate={show ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
-        transition={{ duration: 0.5, delay: write ? delay + duration - 0.05 : 0, ease: EXPO }}
-        style={{ transformBox: "fill-box", transformOrigin: "center" }}
-      />
+      <circle cx={dot.cx} cy={dot.cy} r={dot.r} fill="#0B0C0E" className={write ? "land" : undefined} />
+    </svg>
+  );
+}
+
+/** The "l." mark on ink: the app's icon, for the middle of the QR code. */
+export function AppMark({ className }: { className?: string }) {
+  const { w, h, outline, dot } = MARK;
+  const pad = w * 0.18;
+  return (
+    <svg viewBox={`${-pad} ${-pad} ${w + pad * 2} ${h + pad * 2}`} className={className} aria-hidden>
+      <rect x={-pad} y={-pad} width={w + pad * 2} height={h + pad * 2} rx={(w + pad * 2) * 0.22} fill="#0B0C0E" />
+      <path d={outline} fill="#FF5A1F" fillRule="evenodd" />
+      <circle cx={dot.cx} cy={dot.cy} r={dot.r} fill="#F2EFE8" />
     </svg>
   );
 }
