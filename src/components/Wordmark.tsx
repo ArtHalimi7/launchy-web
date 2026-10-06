@@ -6,7 +6,22 @@ import { MARK, WORDMARK } from "@/lib/brand-paths";
  * logo, stroke by stroke. Pure CSS (globals.css, `.write`), so it plays before any script loads,
  * and reduced motion shows it finished.
  */
-export function Wordmark({ className, write = true, id = "wordmark" }: { className?: string; write?: boolean; /** Unique per use on the page: it names the clip path. */ id?: string }) {
+export function Wordmark({
+  className,
+  write = true,
+  id = "wordmark",
+  dot: stopColor = "#0B0C0E",
+  ink = "#FF5A1F",
+}: {
+  className?: string;
+  write?: boolean;
+  /** Unique per use on the page: it names the clip path. */
+  id?: string;
+  /** The full stop: black on white, white on a photo. */
+  dot?: string;
+  /** The script: orange, or white over the reel, where it sits like a video's watermark. */
+  ink?: string;
+}) {
   const { w, h, outline, stroke, strokeWidth, dot } = WORDMARK;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} className={className} role="img" aria-label="Launchy">
@@ -21,13 +36,13 @@ export function Wordmark({ className, write = true, id = "wordmark" }: { classNa
           pathLength={1}
           className={write ? "write" : undefined}
           fill="none"
-          stroke="#FF5A1F"
+          stroke={ink}
           strokeWidth={strokeWidth * 1.35}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
       </g>
-      <circle cx={dot.cx} cy={dot.cy} r={dot.r} fill="#0B0C0E" className={write ? "land" : undefined} />
+      <circle cx={dot.cx} cy={dot.cy} r={dot.r} fill={stopColor} className={write ? "land" : undefined} />
     </svg>
   );
 }

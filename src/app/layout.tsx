@@ -3,7 +3,7 @@ import { Inter_Tight } from "next/font/google";
 
 import "./globals.css";
 
-// Self-hosted by next/font at build time: no request to Google from the visitor's browser.
+// The app's own typeface. Self-hosted by next/font at build time: no request to Google from the visitor's browser.
 const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-inter-tight", display: "swap" });
 
 export const metadata: Metadata = {
@@ -17,8 +17,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F2EFE8",
-  colorScheme: "light",
+  themeColor: "#000000",
+  colorScheme: "dark",
+  // The stage runs edge to edge on a phone; the pinned button keeps clear of the home bar itself.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

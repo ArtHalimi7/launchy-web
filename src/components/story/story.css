@@ -1,0 +1,614 @@
+/*
+ * The story's stage. One sticky screen that stays put while the story scrolls past it; everything
+ * on it is moved by the timeline (timeline.ts), which only ever changes transforms and opacity.
+ *
+ * Sizes hang off one number, the phone's width `--pw`. Landscape keeps the words to the left of the
+ * phone; portrait keeps them above it.
+ */
+
+.story {
+  --pw: min(34svh, 21vw);
+  /* The phone's height, depth and corner, as shares of its width (Iphone.tsx). */
+  --ph: calc(var(--pw) * 2.06838);
+  --pd: calc(var(--pw) * 0.11017);
+  --pr: calc(var(--pw) * 0.17728);
+  /* Where the phone stands in the hero, below the middle of the screen. */
+  --hero-y: 3svh;
+  --aura: 104svh;
+
+  position: relative;
+  height: 1080svh;
+  background: #000;
+  color: #fff;
+  view-timeline: --story;
+}
+@media (orientation: portrait) {
+  .story {
+    --pw: min(58vw, 27svh);
+    --hero-y: 27svh;
+    --aura: 150vw;
+    height: 970svh;
+  }
+}
+
+/* Every actor plays its keyframes against the story's scroll. Where the browser can't do that
+   itself, they sit paused and StoryDriver sets their time from the scroll. */
+[data-a] {
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-play-state: paused;
+}
+@supports ((animation-timeline: view()) and (animation-range: entry)) {
+  [data-a] {
+    animation-play-state: running;
+    animation-timeline: --story;
+    animation-range: contain 0% contain 100%;
+  }
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100lvh;
+  overflow: clip;
+  isolation: isolate;
+}
+
+/* ---------------------------------------------------------------- the aura */
+
+/* Light, not a shape: a few very soft glows of the brand's orange, each fading to nothing long
+   before its own edge, drifting slowly against each other. No blur filters; just gradients that
+   are painted once, then moved and faded. */
+.aura {
+  position: absolute;
+  z-index: 0;
+  left: calc(50% - var(--aura) / 2);
+  top: calc(50svh + var(--hero-y) - var(--aura) / 2);
+  width: var(--aura);
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+.aura-in {
+  position: absolute;
+  inset: 0;
+  animation: bloom 2.4s var(--ease-expo) both;
+  animation-delay: calc(var(--launch) - 0.15s);
+}
+.aura-in > i {
+  position: absolute;
+  border-radius: 50%;
+}
+/* The wide haze, carrying a fine grain so the long gradients never band. */
+.aura-haze {
+  inset: -38%;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E"),
+    radial-gradient(closest-side, rgb(255 90 31 / 0.56), rgb(255 88 30 / 0.49) 14%, rgb(250 80 26 / 0.36) 30%, rgb(236 70 20 / 0.21) 47%, rgb(220 60 14 / 0.1) 64%, rgb(200 50 10 / 0.03) 82%, rgb(200 50 10 / 0) 100%);
+}
+.aura-ember {
+  inset: 10% -6% -14% 18%;
+  background: radial-gradient(closest-side, rgb(214 46 8 / 0.42), rgb(200 40 6 / 0.24) 38%, rgb(190 36 6 / 0.08) 68%, rgb(190 36 6 / 0) 100%);
+  animation: drift 14s ease-in-out infinite alternate;
+}
+.aura-core {
+  inset: 16%;
+  background: radial-gradient(closest-side, rgb(255 160 100 / 0.6), rgb(255 128 66 / 0.45) 22%, rgb(255 100 44 / 0.24) 46%, rgb(255 90 31 / 0.07) 72%, rgb(255 90 31 / 0) 100%);
+  animation: breathe 9s ease-in-out infinite alternate;
+}
+.aura-flare {
+  inset: -4% 22% 34% -8%;
+  background: radial-gradient(closest-side, rgb(255 178 112 / 0.22), rgb(255 150 90 / 0.08) 50%, rgb(255 150 90 / 0) 100%);
+  animation: drift 19s ease-in-out infinite alternate-reverse;
+}
+@keyframes bloom {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+@keyframes breathe {
+  to {
+    scale: 1.09;
+  }
+}
+@keyframes drift {
+  to {
+    translate: -7% 5%;
+  }
+}
+
+/* ---------------------------------------------------------------- the hero */
+
+.hero {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+}
+.hero-mark {
+  position: absolute;
+  left: 6vw;
+  top: 36px;
+}
+.hero-mark svg {
+  height: 44px;
+  width: auto;
+}
+.hero-title {
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  line-height: 0.9;
+}
+.hero-title > span {
+  display: inline-block;
+  white-space: nowrap;
+}
+.hero-aside {
+  position: absolute;
+  left: 6vw;
+  bottom: 7svh;
+  max-width: 34ch;
+}
+.hero-sub {
+  font-size: clamp(17px, 1.35vw, 21px);
+  line-height: 1.45;
+  color: rgb(255 255 255 / 0.68);
+}
+.hero-qr {
+  position: absolute;
+  right: 6vw;
+  bottom: 7svh;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.hero-qr p {
+  max-width: 13ch;
+  font-size: 14px;
+  line-height: 1.35;
+  color: rgb(255 255 255 / 0.6);
+}
+
+@media (orientation: landscape) {
+  /* The headline stands either side of the phone, which hides the middle of it. */
+  .hero-title {
+    position: absolute;
+    inset: 0;
+    font-size: clamp(56px, 7.6vw, 160px);
+    pointer-events: none;
+  }
+  .hero-title > span {
+    position: absolute;
+    top: calc(50svh + var(--hero-y));
+    margin-top: -0.5em;
+  }
+  .hero-title > span:first-child {
+    right: calc(50% + var(--pw) * 0.6);
+  }
+  .hero-title > span:last-child {
+    left: calc(50% + var(--pw) * 0.6);
+  }
+}
+@media (orientation: portrait) {
+  .hero {
+    bottom: auto;
+    padding: calc(env(safe-area-inset-top) + 22px) 24px 0;
+  }
+  .hero-mark {
+    position: static;
+  }
+  .hero-mark svg {
+    height: 34px;
+  }
+  .hero-title {
+    margin-top: 3svh;
+    max-width: 9ch;
+    font-size: clamp(44px, 13vw, 68px);
+  }
+  .hero-aside {
+    position: static;
+    margin-top: 2.2svh;
+  }
+  .hero-sub {
+    font-size: 16px;
+  }
+  .hero-qr {
+    display: none;
+  }
+}
+@media (orientation: portrait) and (max-height: 700px) {
+  .hero-sub {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------- the phone */
+
+.world {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* The 3D phone (phone-gl.ts). Once it's up, the HTML phone is reduced to its screen, which lies
+   exactly over the model's. */
+.phone-gl {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+.stage.gl .phone-gl {
+  opacity: 1;
+}
+.stage.gl .ip-edge,
+.stage.gl .ip-back {
+  display: none;
+}
+.stage.gl .ip-front,
+.stage.gl .ip-glass {
+  background: none;
+}
+
+.persp {
+  position: absolute;
+  inset: 0;
+  perspective: calc(var(--pw) * 6);
+  perspective-origin: 50% 50svh;
+}
+.tilt {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform-origin: 50% calc(50svh + var(--hero-y));
+}
+.rig {
+  position: absolute;
+  left: calc(50% - var(--pw) / 2);
+  top: calc(50svh - var(--ph) / 2);
+  width: var(--pw);
+  height: var(--ph);
+  transform-style: preserve-3d;
+}
+.intro {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: arrive 1.7s var(--ease-expo) both;
+  animation-delay: calc(var(--launch) + 0.1s);
+}
+@keyframes arrive {
+  from {
+    translate: 0 40svh;
+    rotate: x 28deg;
+  }
+}
+
+/* ---------------------------------------------------------------- the phone */
+
+.ip {
+  --ip-edge: linear-gradient(#0c0d0f 0%, #34363b 14%, #62656b 30%, #26282c 56%, #45484d 80%, #0e0f11 100%);
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+.ip-face,
+.ip-edge {
+  position: absolute;
+  backface-visibility: hidden;
+}
+.ip-face {
+  inset: 0;
+  border-radius: var(--pr);
+}
+.ip-front {
+  transform: translateZ(calc(var(--pd) / 2));
+  background: linear-gradient(145deg, #5a5d63 0%, #1c1d20 28%, #43464b 52%, #141517 78%, #33363a 100%);
+}
+.ip-glass {
+  position: absolute;
+  overflow: hidden;
+  background: linear-gradient(160deg, #0c0d0f, #030304 60%);
+}
+.ip-display {
+  position: absolute;
+  overflow: hidden;
+  background: #000;
+  container-type: inline-size;
+}
+.ip-island {
+  position: absolute;
+  z-index: 20;
+  left: 50%;
+  border-radius: 999px;
+  background: #000;
+}
+.ip-island::after {
+  content: "";
+  position: absolute;
+  right: 17%;
+  top: 50%;
+  width: 26%;
+  aspect-ratio: 1;
+  translate: 0 -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #2b3a55 0%, #0b0f18 55%, #000 75%);
+}
+.ip-glare {
+  position: absolute;
+  inset: -10% -70%;
+  z-index: 30;
+  pointer-events: none;
+  background: linear-gradient(104deg, transparent 38%, rgb(255 255 255 / 0.09) 46%, rgb(255 255 255 / 0.025) 54%, transparent 60%);
+}
+
+.ip-back {
+  transform: rotateY(180deg) translateZ(calc(var(--pd) / 2));
+  overflow: hidden;
+  background: linear-gradient(162deg, #2b2d31 0%, #17181b 34%, #26282c 58%, #111214 100%);
+}
+.ip-plateau {
+  position: absolute;
+  inset: 0 0 auto;
+  height: calc(var(--pw) * 0.5256);
+  border-radius: var(--pr) var(--pr) 0 0;
+  background: linear-gradient(176deg, #35373c 0%, #1f2023 50%, #16171a 100%);
+  box-shadow:
+    0 calc(var(--pw) * 0.008) calc(var(--pw) * 0.02) rgb(0 0 0 / 0.32),
+    inset 0 1px rgb(255 255 255 / 0.9),
+    inset 0 -1px rgb(255 255 255 / 0.55);
+}
+.ip-lens,
+.ip-flash,
+.ip-lidar,
+.ip-mic {
+  position: absolute;
+  translate: -50% -50%;
+  border-radius: 50%;
+  aspect-ratio: 1;
+}
+.ip-lens {
+  width: calc(var(--pw) * 0.245);
+  background: radial-gradient(circle, #07080b 0 34%, #1c2233 40%, #040506 47%, #24272c 55%, #55585e 60%, #cfd1d4 64%, #8f9297 72%, #e4e5e7 82%, #a1a4a9 100%);
+  box-shadow: 0 calc(var(--pw) * 0.01) calc(var(--pw) * 0.022) rgb(0 0 0 / 0.35);
+}
+.ip-lens::after {
+  content: "";
+  position: absolute;
+  left: 38%;
+  top: 34%;
+  width: 14%;
+  height: 9%;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.55);
+  rotate: -30deg;
+}
+.ip-flash {
+  width: calc(var(--pw) * 0.075);
+  background: radial-gradient(circle at 45% 40%, #fffdf2, #ece3c6 55%, #b4ad98);
+}
+.ip-lidar {
+  width: calc(var(--pw) * 0.085);
+  background: radial-gradient(circle at 45% 40%, #3a3d43, #121316 60%, #34363b);
+}
+.ip-mic {
+  width: calc(var(--pw) * 0.022);
+  background: #5b5e63;
+}
+.ip-panel {
+  position: absolute;
+  left: 4.5%;
+  right: 4.5%;
+  top: calc(var(--pw) * 0.585);
+  bottom: 2.2%;
+  border-radius: calc(var(--pr) * 0.8);
+  background: linear-gradient(168deg, #222428 0%, #18191c 50%, #111214 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.32),
+    inset 0 1px 4px rgb(0 0 0 / 0.14);
+}
+.ip-sheen {
+  position: absolute;
+  inset: -10% -70%;
+  background: linear-gradient(110deg, transparent 36%, rgb(255 255 255 / 0.14) 47%, rgb(255 255 255 / 0.03) 55%, transparent 62%);
+}
+
+.ip-edge {
+  height: var(--pd);
+}
+.ip-btn {
+  position: absolute;
+  top: 24%;
+  height: 52%;
+  border-radius: 999px;
+  background: linear-gradient(#1a1b1e, #55585e 38%, #2c2e32 68%, #141517);
+  box-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.45);
+}
+.ip-btn-control {
+  background: linear-gradient(#5b5e64, #26282c 50%, #44474c);
+}
+
+/* The screens on the display, stacked; the timeline crossfades them. */
+.scr {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.scr p {
+  margin: 0;
+}
+.rec-dot {
+  animation: blink 1s steps(1, end) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+.play-bar {
+  transform-origin: left;
+  animation: play 7s linear infinite;
+}
+@keyframes play {
+  from {
+    scale: 0 1;
+  }
+}
+@media (orientation: portrait) {
+  .end-qr {
+    display: none !important;
+  }
+}
+@media (orientation: landscape) {
+  .end-splash {
+    display: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------- the words */
+
+.beats {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  pointer-events: none;
+}
+.beat {
+  position: absolute;
+  left: 6vw;
+  top: 0;
+  height: 100svh;
+  width: min(34vw, 560px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.beat h2 {
+  font-size: clamp(40px, 4.6vw, 86px);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+.beat p {
+  margin-top: 20px;
+  max-width: 30ch;
+  font-size: clamp(17px, 1.35vw, 21px);
+  line-height: 1.45;
+  color: rgb(255 255 255 / 0.66);
+}
+/* The four kinds of idea, named one after another. */
+.formats {
+  margin-top: 30px;
+  display: grid;
+  gap: 2px;
+}
+.formats li {
+  position: relative;
+  font-size: clamp(24px, 2.25vw, 38px);
+  font-weight: 500;
+  line-height: 1.32;
+  letter-spacing: -0.035em;
+}
+.formats li i {
+  position: absolute;
+  left: -0.62em;
+  top: 50%;
+  width: 0.22em;
+  height: 0.22em;
+  margin-top: -0.11em;
+  border-radius: 50%;
+  background: var(--color-ember);
+}
+.beat .formats-say {
+  position: relative;
+  margin-top: 22px;
+  height: 1.5em;
+  font-size: clamp(17px, 1.35vw, 21px);
+}
+.beat .formats-say p {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+
+.beat a,
+.beat .cta {
+  pointer-events: auto;
+}
+@media (orientation: portrait) {
+  .beat {
+    left: 0;
+    right: 0;
+    width: auto;
+    height: auto;
+    justify-content: flex-start;
+    padding: calc(env(safe-area-inset-top) + 7svh) 24px 0;
+  }
+  .beat h2 {
+    font-size: clamp(34px, 9.8vw, 50px);
+  }
+  .beat p {
+    margin-top: 12px;
+    font-size: 16px;
+  }
+  .formats {
+    margin-top: 16px;
+  }
+  .formats li {
+    font-size: 22px;
+  }
+  .formats li i {
+    left: auto;
+    right: calc(100% + 0.4em);
+  }
+}
+@media (orientation: portrait) and (max-height: 760px) {
+  .beat .formats-say {
+    display: none;
+  }
+}
+
+/* Buttons that have faded out can't be tabbed to or tapped. The scene changes a handful of times
+   per story, so this never runs per frame. */
+.stage:not([data-scene="hero"]) .hero-aside,
+.stage:not([data-scene="hero"]) .hero-qr,
+.stage:is([data-scene="hero"], [data-scene="end"]) .pill,
+.stage:not([data-scene="end"]) .s-beat-end {
+  visibility: hidden;
+}
+
+/* The button that stays within reach while the story plays. */
+.pill {
+  position: fixed;
+  z-index: 6;
+  right: 6vw;
+  top: 28px;
+}
+@media (orientation: portrait) {
+  .pill {
+    right: auto;
+    top: auto;
+    left: 50%;
+    bottom: calc(env(safe-area-inset-bottom) + 14px);
+    translate: -50% 0;
+  }
+}
+
+/* ---------------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .aura-in,
+  .aura-in > i,
+  .intro,
+  .rec-dot,
+  .play-bar {
+    animation: none;
+  }
+  .stage .s-rig {
+    transform: none;
+  }
+}

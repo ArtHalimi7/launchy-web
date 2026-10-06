@@ -1,6 +1,6 @@
 "use client";
 
-import { IconArrowUpRight, IconBrandApple } from "@tabler/icons-react";
+import { IconBrandApple } from "@tabler/icons-react";
 import { useSyncExternalStore } from "react";
 
 import { CTA, TESTFLIGHT_URL } from "@/content";
@@ -24,39 +24,28 @@ function usePlatform(): Platform {
 }
 
 /**
- * The one thing the page asks: get the app. On an iPhone (and a computer, where the QR code sits
- * beside it) it opens the TestFlight invite; on Android it says plainly that it's iPhone only for now.
+ * The one thing the page asks: get the app. iPhone and computer: the TestFlight invite. Android:
+ * plainly iPhone only for now, never a button that leads nowhere.
  */
 export function GetApp({ className = "" }: { className?: string }) {
   const platform = usePlatform();
+  const shape = "inline-flex h-[58px] shrink-0 whitespace-nowrap items-center justify-center gap-2.5 rounded-full px-8 text-[17px] font-semibold tracking-[-0.01em]";
 
   if (platform === "android") {
     return (
-      <div className={className}>
-        <div className="flex h-14 w-full items-center justify-center gap-2 rounded-full border sm:inline-flex border-ink/15 px-6 text-[17px] font-semibold text-ink/50 sm:w-auto">
-          <IconBrandApple size={20} stroke={1.8} aria-hidden />
-          {CTA.android}
-        </div>
-        <p className="mt-3 text-center text-[13px] text-ink/55 sm:text-left">{CTA.androidNote}</p>
-      </div>
+      <span className={`${shape} bg-paper text-graphite ring-1 ring-rule ${className}`}>
+        <IconBrandApple size={20} stroke={1.8} aria-hidden />
+        {CTA.android}
+      </span>
     );
   }
 
   return (
-    <div className={className}>
-      <a
-        href={TESTFLIGHT_URL}
-        className="group flex h-14 w-full items-center sm:inline-flex justify-center gap-2.5 rounded-full bg-ember px-7 text-[17px] font-semibold tracking-[-0.01em] text-ink shadow-[0_8px_24px_rgba(255,90,31,0.32)] transition-transform duration-200 active:scale-[0.98] sm:w-auto sm:hover:scale-[1.03]">
-        <IconBrandApple size={21} stroke={1.8} aria-hidden />
-        {CTA.ios}
-        <IconArrowUpRight size={18} stroke={2.4} aria-hidden className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-      </a>
-      <p className="mt-3 text-center text-[13px] text-ink/55 sm:text-left">
-        {CTA.note} ·{" "}
-        <a href="#faq-testflight" className="underline decoration-ink/25 underline-offset-2">
-          {CTA.firstTime}
-        </a>
-      </p>
-    </div>
+    <a
+      href={TESTFLIGHT_URL}
+      className={`${shape} bg-ember text-ink transition-transform duration-300 ease-expo active:scale-[0.97] hover:scale-[1.02] ${className}`}>
+      <IconBrandApple size={21} stroke={1.8} aria-hidden />
+      {CTA.label}
+    </a>
   );
 }
