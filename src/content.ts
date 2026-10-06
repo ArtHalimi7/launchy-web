@@ -9,15 +9,17 @@
  * QR code follows.
  */
 export const TESTFLIGHT_URL = process.env.NEXT_PUBLIC_TESTFLIGHT_URL ?? "https://testflight.apple.com/join/LAUNCHY";
+/** Google Play or a hosted APK; the button uses a placeholder until a URL is configured. */
+export const ANDROID_URL = process.env.NEXT_PUBLIC_ANDROID_URL?.trim() || "#";
 
 /** The headline, in the two halves the phone stands between. */
 export const TITLE = ["Get paid", "to create."] as const;
 export const SUB = "Pick an idea, film it on your phone. We edit it, post it and pay you.";
 
 export const CTA = {
-  label: "Get the app",
-  android: "iPhone only for now",
-  scan: "Scan with your iPhone camera.",
+  label: "iPhone",
+  android: "Android",
+  scan: "Scan with your Phone camera.",
 };
 
 /** The story, one line per thing the phone does on its way through the page. */
@@ -27,7 +29,7 @@ export const STORY = {
   film: { title: "Film it on your phone.", body: "The app tells you every shot: what to do and how long." },
   edit: { title: "We edit it and post it.", body: "You send the takes. We turn them into a finished video." },
   paid: { title: "You get paid.", body: "You earn from the views it gets." },
-  end: { title: "Your turn.", scan: "Point your iPhone camera at the screen.", tap: "Free on iPhone." },
+  end: { title: "Your turn.", scan: "Point your Phone camera at the screen." },
 };
 
 /** The four kinds of video, as the app names and tags them, and a line on each. */

@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 
 import { GetApp } from "@/components/GetApp";
 import { Qr } from "@/components/Qr";
+import { RobotMascot } from "@/components/RobotMascot";
 import { Wordmark } from "@/components/Wordmark";
 import { CTA, FORMATS, STORY, SUB, TESTFLIGHT_URL, TITLE } from "@/content";
 
@@ -68,6 +69,7 @@ export function Story() {
         </div>
 
         <div className="world">
+          <RobotMascot />
           <canvas className="phone-gl" aria-hidden />
           <div className="persp">
             <div className="tilt">
@@ -114,7 +116,6 @@ export function Story() {
             <p className="portrait:hidden">{STORY.end.scan}</p>
             <div className="cta mt-8 flex items-center gap-5 portrait:mt-6">
               <GetApp />
-              <span className="text-[15px] text-white/55 portrait:hidden">{STORY.end.tap}</span>
             </div>
           </div>
         </div>

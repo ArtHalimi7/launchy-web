@@ -2,8 +2,8 @@
 
 Launchy's landing page for creators, told by the phone. An iPhone 18 Pro Max wakes in the dark in
 an orange aura, turns to show itself, picks an idea, films, spins round to the finished video,
-comes back with the money, and ends facing you with the way in on its screen. Then the
-three taps it takes to get the app (TestFlight). It opens with the app's launch: the full stop
+comes back with the money, and ends facing you with the download options. A tiny robot occasionally
+peeks from behind the phone, reacting to the story and waving hello. It opens with the app's launch: the full stop
 writes "launchy" and opens into the page.
 
 The earlier concepts are kept on the `concept/one-take` branch and in git history.
@@ -21,6 +21,9 @@ npm run build && npm start
 Set `NEXT_PUBLIC_TESTFLIGHT_URL` to the app's public TestFlight link (App Store Connect →
 TestFlight → External testing → Public link) when building. The buttons and both QR codes use it;
 the QR codes are drawn at build time, so rebuild after changing it.
+
+The Android download buttons use a `#` placeholder. Set `NEXT_PUBLIC_ANDROID_URL` to the Google Play
+listing or hosted APK URL when ready to wire up the destination.
 
 ## How the story works
 

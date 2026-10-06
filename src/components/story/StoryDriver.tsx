@@ -4,6 +4,7 @@ import Lenis from "lenis";
 import { useEffect } from "react";
 
 import type { PhoneGL } from "./phone-gl";
+import { createRobotCompanion, type RobotCompanion } from "./robot-companion";
 import { type Layout, type PhonePosition, type Pose, rigPose, sample, SCENES } from "./timeline";
 
 /**
@@ -46,6 +47,7 @@ export function StoryDriver() {
     let span = 1;
     let layout: Layout = "l";
     let actors: Animation[] = [];
+    let companion: RobotCompanion | null = null;
     let positions: PhonePosition[] = [];
     const heroAside = story.querySelector<HTMLElement>(".hero-aside");
     const pill = story.querySelector<HTMLElement>(".pill");
@@ -94,6 +96,7 @@ export function StoryDriver() {
           [0.983, end], [1, end],
         ];
       }
+      companion?.resize();
     };
 
     // The recording countdown on the filming screen.
@@ -123,7 +126,9 @@ export function StoryDriver() {
     // The lean toward the pointer, eased.
     const lean = { x: 0, y: 0, tx: 0, ty: 0 };
     const onPointer = (e: PointerEvent) => {
-      if (!pointer.matches || reduced.matches || scene !== "hero") return;
+      if (!pointer.matches || reduced.matches) return;
+      companion?.pointer(e.clientX, e.clientY);
+      if (scene !== "hero") return;
       lean.tx = -(e.clientY / window.innerHeight - 0.5) * 9;
       lean.ty = (e.clientX / window.innerWidth - 0.5) * 14;
       wake();
@@ -151,6 +156,7 @@ export function StoryDriver() {
 
       // With motion reduced the phone stays where the CSS rests it, upright, and only its screens change.
       const pose: Pose = reduced.matches ? { ...rigPose(0, layout, resolve, positions), rx: 0, ry: 0, rz: 0, s: 1 } : rigPose(p, layout, resolve, positions);
+      companion?.update({ progress: p, scene, pose, lean: [lean.x, lean.y] });
       const state = `${p}|${lean.x}|${lean.y}|${layout}`;
       if (state !== last) {
         last = state;
@@ -178,6 +184,7 @@ export function StoryDriver() {
       wake();
     };
 
+    companion = createRobotCompanion(stage, rig, tilt, wake);
     measure();
     tick();
     const lenis = reduced.matches ? null : new Lenis({ autoRaf: true, lerp: 0.09 });
@@ -255,6 +262,7 @@ export function StoryDriver() {
       window.removeEventListener("resize", onResize);
       window.visualViewport?.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointer);
+      companion?.dispose();
       reduced.removeEventListener("change", onResize);
       portrait.removeEventListener("change", onResize);
       cancelAnimationFrame(frame);
