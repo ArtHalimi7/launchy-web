@@ -24,7 +24,7 @@
 }
 @media (orientation: portrait) {
   .story {
-    --pw: min(48vw, 22.5svh);
+    --pw: min(51vw, 24svh);
     --hero-y: 25svh;
     --aura: 150vw;
     height: 970svh;
@@ -204,7 +204,7 @@
     margin: 0 auto;
   }
   .hero-title {
-    margin: 3svh auto 0;
+    margin: 5svh auto 0;
     max-width: 9ch;
     font-size: clamp(42px, 12vw, 64px);
   }
@@ -575,7 +575,14 @@
   }
   .beat .formats-say {
     width: 100%;
+    height: auto;
+    display: grid;
     margin-top: 14px;
+  }
+  .beat .formats-say p {
+    position: static;
+    grid-area: 1 / 1;
+    max-width: none;
   }
 }
 @media (orientation: portrait) and (max-height: 760px) {

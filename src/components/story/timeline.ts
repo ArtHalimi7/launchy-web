@@ -403,9 +403,19 @@ export function sample(actor: string, prop: Prop, at: number, layout: Layout, re
 
 /** The phone: its offset from the middle of the screen (px), its turn (degrees) and its scale. */
 export type Pose = { x: number; y: number; rx: number; ry: number; rz: number; s: number };
+export type PhonePosition = readonly [at: number, y: number];
 
-export function rigPose(at: number, layout: Layout, resolve: Resolve): Pose {
-  const [x, y] = sample("rig", "translate", at, layout, resolve);
+export function rigPose(at: number, layout: Layout, resolve: Resolve, positions: readonly PhonePosition[] = []): Pose {
+  const [x, fallbackY] = sample("rig", "translate", at, layout, resolve);
+  let y = fallbackY;
+  if (layout === "p" && positions.length > 1) {
+    let i = 0;
+    while (i < positions.length - 2 && positions[i + 1][0] <= at) i++;
+    const [from, y0] = positions[i];
+    const [to, y1] = positions[i + 1];
+    const t = Math.min(1, Math.max(0, (at - from) / (to - from)));
+    y = y0 + (y1 - y0) * ease(IO)(t);
+  }
   const [rx, ry, rz] = sample("rig", "transform", at, layout, resolve);
   const [s] = sample("rig", "scale", at, layout, resolve);
   return { x, y, rx, ry, rz, s };

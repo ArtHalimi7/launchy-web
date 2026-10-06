@@ -4,7 +4,7 @@ import Lenis from "lenis";
 import { useEffect } from "react";
 
 import type { PhoneGL } from "./phone-gl";
-import { type Layout, type Pose, rigPose, sample, SCENES } from "./timeline";
+import { type Layout, type PhonePosition, type Pose, rigPose, sample, SCENES } from "./timeline";
 
 /**
  * The part of the story script plays, none of it on the way to first paint:
@@ -46,6 +46,21 @@ export function StoryDriver() {
     let span = 1;
     let layout: Layout = "l";
     let actors: Animation[] = [];
+    let positions: PhonePosition[] = [];
+    const heroAside = story.querySelector<HTMLElement>(".hero-aside");
+    const pill = story.querySelector<HTMLElement>(".pill");
+    const beats = [...story.querySelectorAll<HTMLElement>(".beat")];
+
+    // Layout offsets ignore the entrance and scroll transforms, even for a hidden scene.
+    const bottomOf = (element: HTMLElement) => {
+      let bottom = element.offsetHeight;
+      let parent: HTMLElement | null = element;
+      while (parent && parent !== stage) {
+        bottom += parent.offsetTop;
+        parent = parent.offsetParent as HTMLElement | null;
+      }
+      return bottom;
+    };
     const measure = () => {
       vw = window.innerWidth / 100;
       svh = probe.offsetHeight / 100;
@@ -53,6 +68,32 @@ export function StoryDriver() {
       top = story.getBoundingClientRect().top + window.scrollY;
       span = Math.max(1, story.offsetHeight - window.innerHeight);
       if (!native) actors = story.getAnimations({ subtree: true }).filter((a) => a instanceof CSSAnimation && a.animationName.startsWith("s-"));
+      positions = [];
+      if (layout === "p" && heroAside && pill) {
+        const height = Math.min(probe.offsetHeight, window.visualViewport?.height ?? window.innerHeight);
+        const halfPhone = rig.offsetHeight / 2;
+        const gap = 20;
+        const buttonTop = Math.min(pill.getBoundingClientRect().top, height - pill.offsetHeight - 14);
+        const place = (wordsBottom: number, lowerEdge: number, hero = false) => {
+          const upper = wordsBottom + gap + halfPhone;
+          const lower = lowerEdge - gap - halfPhone;
+          const center = hero ? upper + 16 : (wordsBottom + lowerEdge) / 2 - 12;
+          return Math.max(upper, Math.min(lower, center)) - 50 * svh;
+        };
+        const hero = place(bottomOf(heroAside), height, true);
+        const [phone, idea, film, edit, paid, end] = beats.map((beat) =>
+          place(bottomOf(beat), beat.classList.contains("s-beat-end") ? height : buttonTop),
+        );
+        positions = [
+          [0, hero], [0.039, hero],
+          [0.168, phone], [0.235, phone],
+          [0.313, idea], [0.503, idea],
+          [0.567, film], [0.682, film],
+          [0.805, edit], [0.849, edit],
+          [0.897, paid], [0.927, paid],
+          [0.983, end], [1, end],
+        ];
+      }
     };
 
     // The recording countdown on the filming screen.
@@ -109,15 +150,17 @@ export function StoryDriver() {
       }
 
       // With motion reduced the phone stays where the CSS rests it, upright, and only its screens change.
-      const pose: Pose = reduced.matches ? { ...rigPose(0, layout, resolve), rx: 0, ry: 0, rz: 0, s: 1 } : rigPose(p, layout, resolve);
+      const pose: Pose = reduced.matches ? { ...rigPose(0, layout, resolve, positions), rx: 0, ry: 0, rz: 0, s: 1 } : rigPose(p, layout, resolve, positions);
       const state = `${p}|${lean.x}|${lean.y}|${layout}`;
       if (state !== last) {
         last = state;
         tilt.style.transform = lean.x || lean.y ? `rotateX(${lean.x.toFixed(3)}deg) rotateY(${lean.y.toFixed(3)}deg)` : "";
+        rig.style.translate = `${pose.x.toFixed(2)}px ${pose.y.toFixed(2)}px`;
+        rig.style.scale = pose.s.toFixed(4);
         if (!reduced.matches) {
-          rig.style.translate = `${pose.x.toFixed(2)}px ${pose.y.toFixed(2)}px`;
           rig.style.transform = `rotateX(${pose.rx.toFixed(3)}deg) rotateY(${pose.ry.toFixed(3)}deg) rotateZ(${pose.rz.toFixed(3)}deg)`;
-          rig.style.scale = pose.s.toFixed(4);
+        } else {
+          rig.style.transform = "";
         }
         gl?.draw({ pose, lean: [lean.x, lean.y], aura: sample("aura", "opacity", p, layout, resolve)[0] });
         frame = requestAnimationFrame(tick);
@@ -161,8 +204,17 @@ export function StoryDriver() {
     }
     const resized = new ResizeObserver(onResize);
     resized.observe(story);
+    if (heroAside) resized.observe(heroAside);
+    if (pill) resized.observe(pill);
+    for (const beat of beats) resized.observe(beat);
+    const onFontsLoaded = () => {
+      if (!gone) onResize();
+    };
+    void document.fonts.ready.then(onFontsLoaded);
+    document.fonts.addEventListener("loadingdone", onFontsLoaded);
     window.addEventListener("scroll", wake, { passive: true });
     window.addEventListener("resize", onResize);
+    window.visualViewport?.addEventListener("resize", onResize);
     window.addEventListener("pointermove", onPointer, { passive: true });
     reduced.addEventListener("change", onResize);
     portrait.addEventListener("change", onResize);
@@ -198,8 +250,10 @@ export function StoryDriver() {
       clearTimeout(unhold);
       root.style.overflow = "";
       resized.disconnect();
+      document.fonts.removeEventListener("loadingdone", onFontsLoaded);
       window.removeEventListener("scroll", wake);
       window.removeEventListener("resize", onResize);
+      window.visualViewport?.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointer);
       reduced.removeEventListener("change", onResize);
       portrait.removeEventListener("change", onResize);

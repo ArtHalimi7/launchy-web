@@ -37,13 +37,3 @@ export const FORMATS = [
   { id: "cooking", title: "Cook something", say: "A recipe, shot by shot.", tag: "Food · Recipes" },
   { id: "challenge", title: "Take a challenge", say: "A series on one theme.", tag: "Series · Challenges" },
 ] as const;
-
-/** Getting in is three real steps, because TestFlight is one more app than people expect. */
-export const HOW = {
-  title: "Three taps and you're in.",
-  steps: [
-    { title: "Tap Get the app.", body: "It opens Apple's TestFlight invite for Launchy." },
-    { title: "Install TestFlight.", body: "Apple's free app for trying apps before they reach the App Store." },
-    { title: "Open Launchy.", body: "Pick your first idea: a reaction, a DIY project, a recipe or a challenge." },
-  ],
-};
