@@ -31,6 +31,8 @@ const IO = "cubic-bezier(0.65, 0, 0.35, 1)";
 /** Arrives fast and settles: things entering. */
 const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 const STEP = "steps(1, end)";
+/** iOS's own push between screens: quick to start, long to settle. */
+const IN_OUT_IOS = "cubic-bezier(0.32, 0.72, 0, 1)";
 // A key's timing function shapes the way from that key to the next.
 
 const lp = (l: string, p: string) => ({ l, p });
@@ -40,14 +42,15 @@ const lp = (l: string, p: string) => ({ l, p });
  * right of the words from the ideas on; portrait keeps the words above it.
  */
 export const POS = {
-  hero: lp("0px 3svh", "0px 27svh"),
-  center: lp("0px 0px", "0px 12svh"),
-  side: lp("17vw 0px", "0px 14svh"),
+  hero: lp("0px 3svh", "0px 25svh"),
+  // On a phone: centred in the room the words above and the button below leave it.
+  center: lp("0px 0px", "0px 9svh"),
+  side: lp("17vw 0px", "0px 9svh"),
   /** Filming: a touch higher, drifting up as the take goes on. */
-  film: lp("17vw -2svh", "0px 13svh"),
-  filmed: lp("17vw -4svh", "0px 12svh"),
-  lift: lp("15vw -12svh", "0px 4svh"),
-  end: lp("17vw 0px", "0px 15svh"),
+  film: lp("17vw -2svh", "0px 8.5svh"),
+  filmed: lp("17vw -4svh", "0px 7.5svh"),
+  lift: lp("15vw -12svh", "0px 2svh"),
+  end: lp("17vw 0px", "0px 11svh"),
 };
 
 /** The scenes, by where they start. StoryDriver uses these to know which one is on. */
@@ -106,7 +109,7 @@ function format(i: number): Actor[] {
 
 /** The Create screen, then each format's screen in turn, each one pushed in from the right. */
 function formatScreens(): Actor[] {
-  const swap = (at: number): [number, number] => [at - 0.0045, at + 0.0045];
+  const swap = (at: number): [number, number] => [at - 0.006, at + 0.006];
   // When each screen comes in; the last one leaves as the camera opens.
   const ins = FORMAT_AT.map(swap);
   const outs = [...ins.slice(1), [0.512, 0.528] as [number, number]];
@@ -114,8 +117,8 @@ function formatScreens(): Actor[] {
     name,
     rest: into ? into[1] : 0,
     tracks: [
-      ["opacity", into ? [[into[0], "0"], [into[1], "1"], [out[0], "1"], [out[1], "0"]] : [[out[0], "1"], [out[1], "0"]]],
-      ["translate", into ? [[into[0], "14% 0px", OUT], [into[1], "0% 0px"], [out[0], "0% 0px"], [out[1], "-8% 0px"]] : [[out[0], "0% 0px"], [out[1], "-8% 0px"]]],
+      ["opacity", into ? [[into[0] - 0.0005, "0", STEP], [into[0], "1"], [out[1] - 0.0005, "1", STEP], [out[1], "0"]] : [[out[1] - 0.0005, "1", STEP], [out[1], "0"]]],
+      ["translate", into ? [[into[0], "100% 0px", IN_OUT_IOS], [into[1], "0% 0px"], [out[0], "0% 0px", IN_OUT_IOS], [out[1], "-30% 0px"]] : [[out[0], "0% 0px", IN_OUT_IOS], [out[1], "-30% 0px"]]],
     ],
   });
   return [screen("scr-create", null, ins[0]), ...FORMAT_AT.map((_, i) => screen(`scr-fmt${i}`, ins[i], outs[i]))];
@@ -217,7 +220,7 @@ const ACTORS: Actor[] = [
     name: "aura",
     rest: 0,
     tracks: [
-      ["translate", [[0.039, "0px 0px"], [0.168, lp("0px -3svh", "0px -15svh")], [0.235, lp("0px -3svh", "0px -15svh")], [0.313, lp("17vw -6svh", "0px -14svh")], [0.693, lp("17vw -6svh", "0px -14svh")], [0.805, lp("0px -3svh", "0px -15svh")], [0.927, lp("0px -3svh", "0px -15svh")], [0.983, lp("17vw -3svh", "0px -12svh")]]],
+      ["translate", [[0.039, "0px 0px"], [0.168, lp("0px -3svh", "0px -16svh")], [0.235, lp("0px -3svh", "0px -16svh")], [0.313, lp("17vw -6svh", "0px -16svh")], [0.693, lp("17vw -6svh", "0px -16svh")], [0.805, lp("0px -3svh", "0px -16svh")], [0.927, lp("0px -3svh", "0px -16svh")], [0.983, lp("17vw -3svh", "0px -14svh")]]],
       ["scale", [[0.039, "1"], [0.168, "0.8"], [0.844, "0.8"], [0.922, "1", OUT]]],
       ["opacity", [[0.039, "1"], [0.168, "0.4"], [0.503, "0.4"], [0.536, "0.55"], [0.687, "0.55"], [0.726, "0.4"], [0.844, "0.4"], [0.911, "1"]]],
     ],

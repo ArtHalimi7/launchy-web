@@ -29,7 +29,7 @@ function usePlatform(): Platform {
  */
 export function GetApp({ className = "" }: { className?: string }) {
   const platform = usePlatform();
-  const shape = "inline-flex h-[58px] shrink-0 whitespace-nowrap items-center justify-center gap-2.5 rounded-full px-8 text-[17px] font-semibold tracking-[-0.01em]";
+  const shape = "inline-flex h-[48px] shrink-0 whitespace-nowrap items-center justify-center gap-2 rounded-full px-6 text-[15px] font-semibold tracking-[-0.01em] sm:h-[58px] sm:gap-2.5 sm:px-8 sm:text-[17px]";
 
   if (platform === "android") {
     return (

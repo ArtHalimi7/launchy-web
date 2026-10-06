@@ -91,8 +91,10 @@ export function Story() {
             <ul className="formats">
               {FORMATS.map((f, i) => (
                 <li key={f.id} className={`s-fmt${i}`} data-a>
-                  <i className={`s-fmt-dot${i}`} data-a aria-hidden />
-                  {f.title}
+                  <span>
+                    <i className={`s-fmt-dot${i}`} data-a aria-hidden />
+                    {f.title}
+                  </span>
                 </li>
               ))}
             </ul>

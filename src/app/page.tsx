@@ -1,7 +1,6 @@
 import { GetApp } from "@/components/GetApp";
 import { Launch } from "@/components/Launch";
 import { Story } from "@/components/story/Story";
-import { Wordmark } from "@/components/Wordmark";
 import { HOW } from "@/content";
 
 const WRAP = "mx-auto w-full max-w-[1240px] px-6 md:px-12";
@@ -29,10 +28,6 @@ export default function Home() {
           </ol>
           <GetApp className="mt-14 w-full sm:w-auto" />
         </div>
-        <footer className={`${WRAP} flex items-center justify-between border-t border-white/10 py-7 text-[14px] text-white/45`}>
-          <Wordmark id="wordmark-footer" write={false} dot="#FFFFFF" className="h-7 w-auto" />
-          <span>© 2026 Launchy</span>
-        </footer>
       </section>
     </>
   );

@@ -24,8 +24,8 @@
 }
 @media (orientation: portrait) {
   .story {
-    --pw: min(58vw, 27svh);
-    --hero-y: 27svh;
+    --pw: min(48vw, 22.5svh);
+    --hero-y: 25svh;
     --aura: 150vw;
     height: 970svh;
   }
@@ -193,21 +193,25 @@
   .hero {
     bottom: auto;
     padding: calc(env(safe-area-inset-top) + 22px) 24px 0;
+    text-align: center;
   }
   .hero-mark {
     position: static;
   }
   .hero-mark svg {
-    height: 34px;
+    display: block;
+    height: 32px;
+    margin: 0 auto;
   }
   .hero-title {
-    margin-top: 3svh;
+    margin: 3svh auto 0;
     max-width: 9ch;
-    font-size: clamp(44px, 13vw, 68px);
+    font-size: clamp(42px, 12vw, 64px);
   }
   .hero-aside {
     position: static;
-    margin-top: 2.2svh;
+    max-width: 32ch;
+    margin: 2svh auto 0;
   }
   .hero-sub {
     font-size: 16px;
@@ -513,6 +517,9 @@
   line-height: 1.32;
   letter-spacing: -0.035em;
 }
+.formats li > span {
+  position: relative;
+}
 .formats li i {
   position: absolute;
   left: -0.62em;
@@ -546,7 +553,12 @@
     width: auto;
     height: auto;
     justify-content: flex-start;
-    padding: calc(env(safe-area-inset-top) + 7svh) 24px 0;
+    align-items: center;
+    padding: calc(env(safe-area-inset-top) + 6svh) 24px 0;
+    text-align: center;
+  }
+  .beat .cta {
+    justify-content: center;
   }
   .beat h2 {
     font-size: clamp(34px, 9.8vw, 50px);
@@ -556,14 +568,14 @@
     font-size: 16px;
   }
   .formats {
-    margin-top: 16px;
+    margin-top: 14px;
   }
   .formats li {
-    font-size: 22px;
+    font-size: 21px;
   }
-  .formats li i {
-    left: auto;
-    right: calc(100% + 0.4em);
+  .beat .formats-say {
+    width: 100%;
+    margin-top: 14px;
   }
 }
 @media (orientation: portrait) and (max-height: 760px) {
